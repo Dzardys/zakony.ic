@@ -5,5 +5,5 @@ import react from '@vitejs/plugin-react'
 // Pro projektovou stránku použij název repozitáře, např. '/skimo-lawbook-react/'
 export default defineConfig({
   plugins: [react()],
-  base: '/zakony-public/',
+  base: '/zakony.ic/',
 })
