@@ -52,7 +52,6 @@ export function renderMarkdown(markdown: string): string {
 
     if (!line) {
       flushParagraph()
-      closeLists()
       continue
     }
 
@@ -125,6 +124,7 @@ export function renderMarkdown(markdown: string): string {
       continue
     }
 
+    closeLists()
     paragraph.push(line)
   }
 
