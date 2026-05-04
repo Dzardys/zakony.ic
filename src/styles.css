@@ -439,23 +439,6 @@ h1 {
   margin: 0.75rem 0 1.75rem;
 }
 
-.markdown-body h1 a,
-.markdown-body h2 a,
-.markdown-body h3 a,
-.markdown-body h4 a {
-  opacity: 0;
-  margin-right: 8px;
-  color: var(--accent);
-  transition: opacity .15s ease;
-}
-
-.markdown-body h1:hover a,
-.markdown-body h2:hover a,
-.markdown-body h3:hover a,
-.markdown-body h4:hover a {
-  opacity: 1;
-}
-
 .markdown-body p {
   margin: .8em 0;
 }

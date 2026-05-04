@@ -76,7 +76,7 @@ export function renderMarkdown(markdown: string): string {
       const text = heading[2].trim()
       const id = slugify(text)
 
-      html.push(`<h${level} id="${id}"><a href="#${id}" aria-label="Odkaz na sekci">#</a>${parseInlineMarkdown(text)}</h${level}>`)
+      html.push(`<h${level} id="${id}">${parseInlineMarkdown(text)}</h${level}>`)
       continue
     }
 
