@@ -61,7 +61,7 @@ function LawList({ laws, selectedLaw, onSelect }: { laws: Law[]; selectedLaw?: L
         >
           <span className="law-number">{law.number ?? law.id}</span>
           <strong>{law.title}</strong>
-          <small>{law.category ?? 'Bez kategorie'} · upraveno {formatDate(law.lastUpdated)}</small>
+          <small>upraveno {formatDate(law.lastUpdated)}</small>
         </button>
       ))}
     </div>
@@ -166,7 +166,6 @@ function App() {
           <h1>Elektronická kniha zákonů</h1>
           <p>
             Pouze aktuální znění platných zákonů San Andreas.
-            (( Web načítá aktuální zákony přímo z GitHub repozitáře. Úpravy probíhají přes pull requesty a po schválení se zde automaticky projeví. ))
           </p>
         </div>
 
