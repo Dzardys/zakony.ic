@@ -209,7 +209,7 @@ function App() {
       <footer className="site-footer">
         <span>San Andreas - Elektronická kniha zákonů</span>
         <span className="footer-sep" />
-        <span>Vytvořil Steve Zayas, ZAYA-TEC (639)</span>
+        <span>Vláda San Andreas - zřizovatel nebere odpovědnost za úpravu obsahu zákonů</span>
       </footer>
     </div>
   )
