@@ -153,14 +153,8 @@ function App() {
   return (
     <div className="app-shell">
       <header className="hero">
-        <nav className="topbar">
-          <a href={GITHUB_REPO_URL} target="_blank" rel="noreferrer" className="topbar-repo-link">Repozitář</a>
-        </nav>
-
-        <div className="hero-content" id="top">
-          <p className="eyebrow">San Andreas</p>
           <h1>Elektronická kniha zákonů</h1>
-        </div>
+          <a href={GITHUB_REPO_URL} target="_blank" rel="noreferrer" className="source-link">Repozitář</a>
       </header>
 
       <main className="main-grid">
