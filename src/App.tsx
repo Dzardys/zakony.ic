@@ -154,11 +154,7 @@ function App() {
     <div className="app-shell">
       <header className="hero">
         <nav className="topbar">
-          <a className="brand" href="#top" aria-label="Skimo zákony">
-            <span className="brand-mark">§</span>
-            <span>Kniha zákonů</span>
-          </a>
-          <a href={GITHUB_REPO_URL} target="_blank" rel="noreferrer">Repozitář</a>
+          <a href={GITHUB_REPO_URL} target="_blank" rel="noreferrer" className="topbar-repo-link">Repozitář</a>
         </nav>
 
         <div className="hero-content" id="top">
