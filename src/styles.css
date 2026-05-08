@@ -12,6 +12,7 @@
   --accent-strong: #d4b560;
   --danger: #d96060;
   --seal-block-gap: 2.5rem;
+  --sidebar-w: 360px;
 }
 
 * {
@@ -89,7 +90,7 @@ h1 {
 
 .main-grid {
   display: grid;
-  grid-template-columns: minmax(300px, 420px) minmax(0, 1fr);
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
   flex: 1;
 }
 
@@ -218,14 +219,14 @@ h1 {
 .content-panel {
   min-width: 0;
   padding: 28px clamp(16px, 4vw, 56px) 56px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  /* extra right padding compensates for sidebar so content is centered on viewport */
+  padding-right: calc(clamp(16px, 4vw, 56px) + var(--sidebar-w));
 }
 
 .law-detail {
   width: 100%;
   max-width: 860px;
+  margin: 0 auto;
 }
 
 .law-detail-header {
@@ -546,6 +547,10 @@ h1 {
   .source-link {
     display: inline-block;
     margin-top: 10px;
+  }
+
+  .content-panel {
+    padding-right: clamp(16px, 4vw, 56px);
   }
 }
 
