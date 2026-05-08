@@ -26,15 +26,6 @@ function matchesQuery(law: Law, query: string): boolean {
   return q.split(/\s+/).every((part) => haystack.includes(part))
 }
 
-function StatCard({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="stat-card">
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
-  )
-}
-
 function EmptyRepositoryHint() {
   return (
     <section className="empty-state">
@@ -49,7 +40,7 @@ function EmptyRepositoryHint() {
   )
 }
 
-function LawList({ laws, selectedLaw, onSelect }: { laws: Law[]; selectedLaw?: Law; onSelect: (law: Law) => void }) {
+function LawList({ laws, selectedLaw, onSelect, onSelect: _onSelect }: { laws: Law[]; selectedLaw?: Law; onSelect: (law: Law) => void }) {
   return (
     <div className="law-list">
       {laws.map((law) => (
@@ -111,6 +102,7 @@ function App() {
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
   const [selectedId, setSelectedId] = useState<string>('')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -130,13 +122,6 @@ function App() {
     return () => { mounted = false }
   }, [])
 
-  const latestChange = useMemo(() => {
-    const dates = laws.map((law) => law.lastUpdated).filter(Boolean) as string[]
-    return dates.sort((a, b) => compareDatesDesc(a, b))[0]
-  }, [laws])
-
-  const categories = useMemo(() => new Set(laws.map((law) => law.category).filter(Boolean)).size, [laws])
-
   const filteredLaws = useMemo(() => {
     return laws.filter((law) => {
       if (!matchesQuery(law, query)) return false
@@ -150,15 +135,33 @@ function App() {
     return filteredLaws.find((law) => law.id === selectedId) ?? filteredLaws[0] ?? laws.find((law) => law.id === selectedId)
   }, [filteredLaws, laws, selectedId])
 
+  function handleSelectLaw(law: Law) {
+    setSelectedId(law.id)
+    setSidebarOpen(false)
+  }
+
   return (
     <div className="app-shell">
       <header className="hero">
-          <h1>Elektronická kniha zákonů</h1>
-          <a href={GITHUB_REPO_URL} target="_blank" rel="noreferrer" className="source-link">Repozitář</a>
+        <button
+          className="hamburger"
+          aria-label={sidebarOpen ? 'Zavřít seznam zákonů' : 'Otevřít seznam zákonů'}
+          aria-expanded={sidebarOpen}
+          onClick={() => setSidebarOpen((v) => !v)}
+          type="button"
+        >
+          <span /><span /><span />
+        </button>
+        <h1>Elektronická kniha zákonů</h1>
+        <a href={GITHUB_REPO_URL} target="_blank" rel="noreferrer" className="source-link">Repozitář</a>
       </header>
 
+      {sidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+      )}
+
       <main className="main-grid">
-        <aside className="sidebar">
+        <aside className={`sidebar ${sidebarOpen ? 'sidebar--open' : ''}`}>
           <div className="search-card">
             <label htmlFor="search">Vyhledávání v zákonech</label>
             <input
@@ -172,7 +175,7 @@ function App() {
           {loadState === 'loading' && <div className="loader">Načítám zákony z GitHubu…</div>}
           {loadState === 'error' && <div className="error-box">{error}</div>}
           {loadState === 'ready' && laws.length === 0 && <EmptyRepositoryHint />}
-          {filteredLaws.length > 0 && <LawList laws={filteredLaws} selectedLaw={selectedLaw} onSelect={(law) => setSelectedId(law.id)} />}
+          {filteredLaws.length > 0 && <LawList laws={filteredLaws} selectedLaw={selectedLaw} onSelect={handleSelectLaw} />}
           {loadState === 'ready' && laws.length > 0 && filteredLaws.length === 0 && (
             <div className="empty-state compact">Nic nenalezeno. Zkus jiné klíčové slovo.</div>
           )}
