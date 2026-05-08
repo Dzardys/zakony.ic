@@ -160,14 +160,6 @@ function App() {
         <div className="hero-content" id="top">
           <p className="eyebrow">San Andreas</p>
           <h1>Elektronická kniha zákonů</h1>
-          <p>
-            Pouze aktuální znění platných zákonů San Andreas.
-          </p>
-        </div>
-
-        <div className="stats-grid">
-          <StatCard label="Zákonů" value={laws.length} />
-          <StatCard label="Poslední úprava" value={formatDate(latestChange)} />
         </div>
       </header>
 

@@ -55,7 +55,7 @@ pre {
 /* ── Header ─────────────────────────────────────────── */
 
 .hero {
-  padding: 20px clamp(16px, 4vw, 48px) 28px;
+  padding: 14px clamp(16px, 4vw, 48px) 16px;
   border-bottom: 1px solid var(--border);
   background: var(--bg-soft);
   border-left: 3px solid var(--accent);
@@ -66,7 +66,7 @@ pre {
   align-items: center;
   justify-content: flex-end;
   gap: 16px;
-  margin-bottom: 32px;
+  margin-bottom: 0;
 }
 
 .topbar-repo-link {
@@ -80,24 +80,29 @@ pre {
 }
 
 .hero-content {
-  max-width: 760px;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  max-width: none;
 }
 
 .eyebrow {
-  margin: 0 0 6px;
-  color: var(--muted);
-  font-size: .75rem;
+  margin: 0;
+  color: var(--muted-2);
+  font-size: .72rem;
   font-weight: 600;
   letter-spacing: .1em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 h1 {
   max-width: 700px;
-  margin: 0 0 10px;
-  font-size: clamp(1.8rem, 4vw, 3rem);
+  margin: 2px 0 0;
+  font-size: clamp(1.4rem, 3vw, 2rem);
   line-height: 1.1;
   letter-spacing: -.03em;
+  font-weight: 700;
 }
 
 .hero-content > p:last-child {
@@ -108,41 +113,13 @@ h1 {
   margin: 0;
 }
 
-.stats-grid {
-  display: flex;
-  gap: 16px;
-  margin-top: 20px;
-  flex-wrap: wrap;
-}
 
-.stat-card {
-  padding: 10px 16px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg-elevated);
-}
-
-.stat-card span {
-  display: block;
-  color: var(--muted-2);
-  font-size: .75rem;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  font-weight: 600;
-}
-
-.stat-card strong {
-  display: block;
-  margin-top: 3px;
-  font-size: 1.05rem;
-  font-weight: 600;
-}
 
 /* ── Layout ─────────────────────────────────────────── */
 
 .main-grid {
   display: grid;
-  grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+  grid-template-columns: minmax(300px, 420px) minmax(0, 1fr);
   flex: 1;
 }
 
@@ -581,10 +558,6 @@ h1 {
 /* ── Responsive ─────────────────────────────────────── */
 
 @media (max-width: 980px) {
-  .stats-grid {
-    gap: 10px;
-  }
-
   .main-grid {
     grid-template-columns: 1fr;
   }
