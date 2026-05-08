@@ -247,7 +247,7 @@ h1 {
 /* ── Law detail ─────────────────────────────────────── */
 
 .law-detail {
-  max-width: 780px;
+  max-width: none;
 }
 
 .law-detail-header {
@@ -333,7 +333,7 @@ h1 {
 /* ── Markdown body ──────────────────────────────────── */
 
 .markdown-body {
-  max-width: 780px;
+  max-width: none;
   color: var(--text);
   font-size: 1rem;
   line-height: 1.8;
@@ -463,7 +463,6 @@ h1 {
 .loader {
   color: var(--muted);
   padding: 20px 0;
-  max-width: 780px;
 }
 
 .empty-state h2,
