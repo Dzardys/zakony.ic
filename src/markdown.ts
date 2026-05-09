@@ -1,5 +1,23 @@
 import { escapeHtml, parseInlineMarkdown, slugify } from './utils'
 
+function isLawOverviewHeading(text: string): boolean {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ') === 'tento zakon upravuje:'
+}
+
+function isSignatureImage(alt: string, src: string, previousElementWasHr: boolean): boolean {
+  const haystack = `${alt} ${src}`
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+
+  return previousElementWasHr || /(^|[-_\s/.])(podpis|signature|sign|parafa)([-_\s/.]|$)/.test(haystack)
+}
+
 export function renderMarkdown(markdown: string): string {
   const lines = markdown.replace(/\r\n/g, '\n').split('\n')
   const html: string[] = []
@@ -8,23 +26,35 @@ export function renderMarkdown(markdown: string): string {
   let orderedListOpen = false
   let codeOpen = false
   let codeBuffer: string[] = []
+  let previousElementWasHr = false
 
   const flushParagraph = () => {
     if (!paragraph.length) return
-    html.push(`<p>${parseInlineMarkdown(paragraph.join(' '))}</p>`)
+
+    const rawText = paragraph.join(' ')
+    const className = isLawOverviewHeading(rawText) ? ' class="law-overview-heading"' : ''
+
+    html.push(`<p${className}>${parseInlineMarkdown(rawText)}</p>`)
     paragraph = []
+    previousElementWasHr = false
   }
 
   const closeLists = () => {
+    let closed = false
+
     if (unorderedListOpen) {
       html.push('</ul>')
       unorderedListOpen = false
+      closed = true
     }
 
     if (orderedListOpen) {
       html.push('</ol>')
       orderedListOpen = false
+      closed = true
     }
+
+    if (closed) previousElementWasHr = false
   }
 
   for (const rawLine of lines) {
@@ -60,10 +90,14 @@ export function renderMarkdown(markdown: string): string {
       flushParagraph()
       closeLists()
 
-      const alt = escapeHtml(imageMatch[1])
-      const src = escapeHtml(imageMatch[2])
+      const rawAlt = imageMatch[1]
+      const rawSrc = imageMatch[2]
+      const alt = escapeHtml(rawAlt)
+      const src = escapeHtml(rawSrc)
+      const className = isSignatureImage(rawAlt, rawSrc, previousElementWasHr) ? ' class="signature-image"' : ''
 
-      html.push(`<img src="${src}" alt="${alt}" loading="lazy" />`)
+      html.push(`<img${className} src="${src}" alt="${alt}" loading="lazy" />`)
+      previousElementWasHr = false
       continue
     }
 
@@ -77,6 +111,7 @@ export function renderMarkdown(markdown: string): string {
       const id = slugify(text)
 
       html.push(`<h${level} id="${id}">${parseInlineMarkdown(text)}</h${level}>`)
+      previousElementWasHr = false
       continue
     }
 
@@ -85,6 +120,7 @@ export function renderMarkdown(markdown: string): string {
       flushParagraph()
       closeLists()
       html.push('<hr />')
+      previousElementWasHr = true
       continue
     }
 
@@ -103,6 +139,7 @@ export function renderMarkdown(markdown: string): string {
       }
 
       html.push(`<li>${parseInlineMarkdown(unorderedListItem[1])}</li>`)
+      previousElementWasHr = false
       continue
     }
 
@@ -121,6 +158,7 @@ export function renderMarkdown(markdown: string): string {
       }
 
       html.push(`<li>${parseInlineMarkdown(orderedListItem[1])}</li>`)
+      previousElementWasHr = false
       continue
     }
 
