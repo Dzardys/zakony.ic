@@ -404,7 +404,7 @@ h1 {
 
 .markdown-body strong { color: #fff; }
 
-.markdown-body img {
+ .markdown-body img {
   display: block;
   width: auto;
   max-width: 200px;
@@ -412,60 +412,12 @@ h1 {
   margin: 1rem auto 2rem;
   object-fit: contain;
   opacity: .9;
-  background: #fff;
-  padding: 10px;
-  border-radius: 6px;
 }
 
 .markdown-body img.signature-image {
-  background: #fff;
-  padding: 10px;
-  border-radius: 6px;
-}
-
-.markdown-body .law-overview-heading,
-.markdown-body .law-overview-heading + ul,
-.markdown-body .law-overview-heading + ol {
-  text-align: center;
-}
-
-.markdown-body .law-overview-heading {
-  font-weight: 600;
-  margin-top: 1.25rem;
-  margin-bottom: .5rem;
-}
-
-.markdown-body .law-overview-heading + ul,
-.markdown-body .law-overview-heading + ol {
-  padding-left: 0;
-  list-style-position: inside;
-}
-
-.markdown-body img.signature-image {
-  background: #fff;
-  padding: 10px;
-  border-radius: 6px;
-}
-
-.markdown-body .law-overview-heading,
-.markdown-body .law-overview-heading + ul,
-.markdown-body .law-overview-heading + ol {
-  text-align: center;
-}
-
-.markdown-body .law-overview-heading {
-  font-weight: 600;
-  margin-top: 1.25rem;
-  margin-bottom: .5rem;
-}
-
-.markdown-body .law-overview-heading + ul,
-.markdown-body .law-overview-heading + ol {
-  padding-left: 0;
-  list-style-position: inside;
-}
-
-.markdown-body img.signature-image {
+  max-width: 150px;
+  max-height: 75px;
+  margin: 2rem auto 1rem;
   background: #fff;
   padding: 10px;
   border-radius: 6px;
@@ -516,17 +468,6 @@ h1 {
 
 .markdown-body li { margin: .4rem 0; }
 
-.markdown-body hr + img,
-.markdown-body img:last-of-type {
-  max-width: 150px;
-  max-height: 75px;
-  margin: 2rem 0 1rem;
-}
-
-.markdown-body img:last-of-type + p,
-.markdown-body img:last-of-type + p + p {
-  text-align: left;
-}
 
 .markdown-body code {
   padding: .1em .35em;
