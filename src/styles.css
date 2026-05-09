@@ -412,6 +412,33 @@ h1 {
   margin: 1rem auto 2rem;
   object-fit: contain;
   opacity: .9;
+  background: #fff;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.markdown-body img.signature-image {
+  background: #fff;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.markdown-body .law-overview-heading,
+.markdown-body .law-overview-heading + ul,
+.markdown-body .law-overview-heading + ol {
+  text-align: center;
+}
+
+.markdown-body .law-overview-heading {
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: .5rem;
+}
+
+.markdown-body .law-overview-heading + ul,
+.markdown-body .law-overview-heading + ol {
+  padding-left: 0;
+  list-style-position: inside;
 }
 
 .markdown-body img.signature-image {
