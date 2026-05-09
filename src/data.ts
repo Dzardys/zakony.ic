@@ -3,6 +3,10 @@ import { parseFrontmatter } from './frontmatter'
 import type { GithubTreeItem, Law } from './types'
 import { ensureArrayOfAmendments, getFirstHeading, inferNumberFromText, slugify, stripMarkdown } from './utils'
 
+
+const LAW_LOAD_BATCH_SIZE = 10
+
+
 function isLawCandidate(path: string): boolean {
   const lowerPath = path.toLowerCase()
   const hasAllowedExtension = ALLOWED_EXTENSIONS.some((extension) => lowerPath.endsWith(extension))
@@ -95,6 +99,33 @@ async function fetchTree(): Promise<GithubTreeItem[]> {
   return payload.tree ?? []
 }
 
+async function loadLawFile(file: GithubTreeItem): Promise<Law | undefined> {
+  try {
+    const raw = await fetchText(rawUrl(file.path))
+    const law = file.path.toLowerCase().endsWith('.json')
+      ? lawFromJson(raw, file.path)
+      : lawFromMarkdown(raw, file.path)
+
+    return law.content || law.title ? law : undefined
+  } catch (error) {
+    console.warn(`Soubor ${file.path} byl přeskočen`, error)
+    return undefined
+  }
+}
+
+async function loadLawFilesRecursively(files: GithubTreeItem[], index = 0, laws: Law[] = []): Promise<Law[]> {
+  if (index >= files.length) return laws
+
+  const batch = files.slice(index, index + LAW_LOAD_BATCH_SIZE)
+  const loadedBatch = await Promise.all(batch.map(loadLawFile))
+
+  for (const law of loadedBatch) {
+    if (law) laws.push(law)
+  }
+
+  return loadLawFilesRecursively(files, index + LAW_LOAD_BATCH_SIZE, laws)
+}
+
 export async function loadLaws(): Promise<Law[]> {
   const tree = await fetchTree()
   const files = tree
@@ -102,18 +133,7 @@ export async function loadLaws(): Promise<Law[]> {
     .filter((item) => isLawCandidate(item.path))
     .sort((a, b) => a.path.localeCompare(b.path, 'cs'))
 
-  const laws: Law[] = []
-  for (const file of files) {
-    try {
-      const raw = await fetchText(rawUrl(file.path))
-      const law = file.path.toLowerCase().endsWith('.json')
-        ? lawFromJson(raw, file.path)
-        : lawFromMarkdown(raw, file.path)
-      if (law.content || law.title) laws.push(law)
-    } catch (error) {
-      console.warn(`Soubor ${file.path} byl přeskočen`, error)
-    }
-  }
+  const laws = await loadLawFilesRecursively(files)
 
   return laws.sort((a, b) => {
     const numberCompare = (a.number ?? a.id).localeCompare(b.number ?? b.id, 'cs', { numeric: true })
