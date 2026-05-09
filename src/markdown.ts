@@ -51,6 +51,24 @@ function isSignatureImage(alt: string, src: string, lines: string[], index: numb
   return isSignatureImageByName(alt, src) || imageLooksLikeTrailingSignature(lines, index)
 }
 
+function isLawOverviewHeading(text: string): boolean {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ') === 'tento zakon upravuje:'
+}
+
+function isSignatureImage(alt: string, src: string, previousElementWasHr: boolean): boolean {
+  const haystack = `${alt} ${src}`
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+
+  return previousElementWasHr || /(^|[-_\s/.])(podpis|signature|sign|parafa)([-_\s/.]|$)/.test(haystack)
+}
+
 export function renderMarkdown(markdown: string): string {
   const lines = markdown.replace(/\r\n/g, '\n').split('\n')
   const html: string[] = []
@@ -59,6 +77,7 @@ export function renderMarkdown(markdown: string): string {
   let orderedListOpen = false
   let codeOpen = false
   let codeBuffer: string[] = []
+<<<<<<< HEAD
   let lawOverviewBlockOpen = false
 
   const openLawOverviewBlock = () => {
@@ -74,30 +93,45 @@ export function renderMarkdown(markdown: string): string {
       lawOverviewBlockOpen = false
     }
   }
+=======
+  let previousElementWasHr = false
+>>>>>>> c858f0aec13e01825a5d68a405c492871cb5cb0b
 
   const flushParagraph = () => {
     if (!paragraph.length) return
 
     const rawText = paragraph.join(' ')
+<<<<<<< HEAD
     const isOverviewHeading = isLawOverviewHeading(rawText)
 
     if (isOverviewHeading) openLawOverviewBlock()
 
     const className = isOverviewHeading ? ' class="law-overview-heading"' : ''
+=======
+    const className = isLawOverviewHeading(rawText) ? ' class="law-overview-heading"' : ''
+
+>>>>>>> c858f0aec13e01825a5d68a405c492871cb5cb0b
     html.push(`<p${className}>${parseInlineMarkdown(rawText)}</p>`)
     paragraph = []
+    previousElementWasHr = false
   }
 
   const closeLists = () => {
+    let closed = false
+
     if (unorderedListOpen) {
       html.push('</ul>')
       unorderedListOpen = false
+      closed = true
     }
 
     if (orderedListOpen) {
       html.push('</ol>')
       orderedListOpen = false
+      closed = true
     }
+
+    if (closed) previousElementWasHr = false
   }
 
   for (let index = 0; index < lines.length; index += 1) {
@@ -140,9 +174,16 @@ export function renderMarkdown(markdown: string): string {
       const rawSrc = imageMatch[2]
       const alt = escapeHtml(rawAlt)
       const src = escapeHtml(rawSrc)
+<<<<<<< HEAD
       const className = isSignatureImage(rawAlt, rawSrc, lines, index) ? ' class="signature-image"' : ''
 
       html.push(`<img${className} src="${src}" alt="${alt}" loading="lazy" />`)
+=======
+      const className = isSignatureImage(rawAlt, rawSrc, previousElementWasHr) ? ' class="signature-image"' : ''
+
+      html.push(`<img${className} src="${src}" alt="${alt}" loading="lazy" />`)
+      previousElementWasHr = false
+>>>>>>> c858f0aec13e01825a5d68a405c492871cb5cb0b
       continue
     }
 
@@ -157,6 +198,7 @@ export function renderMarkdown(markdown: string): string {
       const id = slugify(text)
 
       html.push(`<h${level} id="${id}">${parseInlineMarkdown(text)}</h${level}>`)
+      previousElementWasHr = false
       continue
     }
 
@@ -166,6 +208,7 @@ export function renderMarkdown(markdown: string): string {
       closeLists()
       closeLawOverviewBlock()
       html.push('<hr />')
+      previousElementWasHr = true
       continue
     }
 
@@ -184,6 +227,7 @@ export function renderMarkdown(markdown: string): string {
       }
 
       html.push(`<li>${parseInlineMarkdown(unorderedListItem[1])}</li>`)
+      previousElementWasHr = false
       continue
     }
 
@@ -202,6 +246,7 @@ export function renderMarkdown(markdown: string): string {
       }
 
       html.push(`<li>${parseInlineMarkdown(orderedListItem[1])}</li>`)
+      previousElementWasHr = false
       continue
     }
 
