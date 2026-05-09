@@ -1,4 +1,55 @@
-import { escapeHtml, parseInlineMarkdown, slugify } from './utils'
+import { escapeHtml, parseInlineMarkdown, slugify, stripMarkdown } from './utils'
+
+function normalizePlainText(text: string): string {
+  return stripMarkdown(text)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+}
+
+function isLawOverviewHeading(text: string): boolean {
+  return normalizePlainText(text) === 'tento zakon upravuje:'
+}
+
+function isSignatureImageByName(alt: string, src: string): boolean {
+  const haystack = `${alt} ${src}`
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+
+  return /(^|[-_\s/.])(podpis|signature|sign|parafa)([-_\s/.]|$)/.test(haystack)
+}
+
+function previousMeaningfulLineIsHr(lines: string[], index: number): boolean {
+  for (let i = index - 1; i >= 0; i -= 1) {
+    const line = lines[i].trim()
+    if (!line) continue
+    return /^---+$/.test(line)
+  }
+
+  return false
+}
+
+function imageLooksLikeTrailingSignature(lines: string[], index: number): boolean {
+  if (!previousMeaningfulLineIsHr(lines, index)) return false
+
+  for (let i = index + 1; i < lines.length; i += 1) {
+    const line = lines[i].trim()
+    if (!line) continue
+
+    if (/^#{1,6}\s+/.test(line)) return false
+    if (/^!\[[^\]]*\]\((https?:\/\/[^)]+)\)$/.test(line)) return false
+    if (/^---+$/.test(line)) return false
+  }
+
+  return true
+}
+
+function isSignatureImage(alt: string, src: string, lines: string[], index: number): boolean {
+  return isSignatureImageByName(alt, src) || imageLooksLikeTrailingSignature(lines, index)
+}
 
 export function renderMarkdown(markdown: string): string {
   const lines = markdown.replace(/\r\n/g, '\n').split('\n')
@@ -8,10 +59,32 @@ export function renderMarkdown(markdown: string): string {
   let orderedListOpen = false
   let codeOpen = false
   let codeBuffer: string[] = []
+  let lawOverviewBlockOpen = false
+
+  const openLawOverviewBlock = () => {
+    if (!lawOverviewBlockOpen) {
+      html.push('<div class="law-overview-block">')
+      lawOverviewBlockOpen = true
+    }
+  }
+
+  const closeLawOverviewBlock = () => {
+    if (lawOverviewBlockOpen) {
+      html.push('</div>')
+      lawOverviewBlockOpen = false
+    }
+  }
 
   const flushParagraph = () => {
     if (!paragraph.length) return
-    html.push(`<p>${parseInlineMarkdown(paragraph.join(' '))}</p>`)
+
+    const rawText = paragraph.join(' ')
+    const isOverviewHeading = isLawOverviewHeading(rawText)
+
+    if (isOverviewHeading) openLawOverviewBlock()
+
+    const className = isOverviewHeading ? ' class="law-overview-heading"' : ''
+    html.push(`<p${className}>${parseInlineMarkdown(rawText)}</p>`)
     paragraph = []
   }
 
@@ -27,12 +100,14 @@ export function renderMarkdown(markdown: string): string {
     }
   }
 
-  for (const rawLine of lines) {
+  for (let index = 0; index < lines.length; index += 1) {
+    const rawLine = lines[index]
     const line = rawLine.trim()
 
     if (line.startsWith('```')) {
       flushParagraph()
       closeLists()
+      closeLawOverviewBlock()
 
       if (codeOpen) {
         html.push(`<pre><code>${escapeHtml(codeBuffer.join('\n'))}</code></pre>`)
@@ -59,11 +134,15 @@ export function renderMarkdown(markdown: string): string {
     if (imageMatch) {
       flushParagraph()
       closeLists()
+      closeLawOverviewBlock()
 
-      const alt = escapeHtml(imageMatch[1])
-      const src = escapeHtml(imageMatch[2])
+      const rawAlt = imageMatch[1]
+      const rawSrc = imageMatch[2]
+      const alt = escapeHtml(rawAlt)
+      const src = escapeHtml(rawSrc)
+      const className = isSignatureImage(rawAlt, rawSrc, lines, index) ? ' class="signature-image"' : ''
 
-      html.push(`<img src="${src}" alt="${alt}" loading="lazy" />`)
+      html.push(`<img${className} src="${src}" alt="${alt}" loading="lazy" />`)
       continue
     }
 
@@ -71,6 +150,7 @@ export function renderMarkdown(markdown: string): string {
     if (heading) {
       flushParagraph()
       closeLists()
+      closeLawOverviewBlock()
 
       const level = Math.min(heading[1].length, 4)
       const text = heading[2].trim()
@@ -84,6 +164,7 @@ export function renderMarkdown(markdown: string): string {
     if (hr) {
       flushParagraph()
       closeLists()
+      closeLawOverviewBlock()
       html.push('<hr />')
       continue
     }
@@ -130,6 +211,7 @@ export function renderMarkdown(markdown: string): string {
 
   flushParagraph()
   closeLists()
+  closeLawOverviewBlock()
 
   if (codeOpen) {
     html.push(`<pre><code>${escapeHtml(codeBuffer.join('\n'))}</code></pre>`)

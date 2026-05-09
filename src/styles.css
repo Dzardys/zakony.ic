@@ -414,6 +414,43 @@ h1 {
   opacity: .9;
 }
 
+.markdown-body img.signature-image {
+  background: #fff;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.markdown-body .law-overview-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+  margin: 1.25rem 0 1.5rem;
+}
+
+.markdown-body .law-overview-block p {
+  width: 100%;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.markdown-body .law-overview-heading {
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: .5rem;
+}
+
+.markdown-body .law-overview-block ul,
+.markdown-body .law-overview-block ol {
+  display: inline-block;
+  padding-left: 0;
+  list-style-position: inside;
+  text-align: center;
+}
+
 .markdown-body hr {
   border: 0;
   border-top: 1px solid var(--border);
